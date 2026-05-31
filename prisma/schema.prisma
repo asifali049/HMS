@@ -72,8 +72,11 @@ model Appointment {
   tokenNumber   Int
 
   date          DateTime
+  time          String
 
-  status        String
+  reason        String?
+
+  status        String   @default("PENDING")
 
   notes         String?
 
