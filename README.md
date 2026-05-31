@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Hospital Management System
 
 A modern Hospital Management System built with Next.js, Prisma, MySQL, and Tailwind CSS. The application helps hospitals and clinics manage patients, doctors, appointments, billing, prescriptions, and administrative operations through a centralized dashboard.
@@ -44,3 +45,6 @@ The objective of this project is to digitize hospital workflows, reduce paperwor
 ```bash
 npm install
 npm run dev
+=======
+
+>>>>>>> b74b9b05b629d203c3a3cff664e1bb921033284a
