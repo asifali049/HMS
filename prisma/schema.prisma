@@ -1,0 +1,120 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Admin {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Hospital {
+  id          String   @id @default(cuid())
+  name        String
+  email       String
+  phone       String
+  address     String
+  description String?
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Doctor {
+  id                String   @id @default(cuid())
+  name              String
+  specialization    String
+  qualification     String
+  experience        Int
+  consultationFee   Float
+
+  mobile            String
+  email             String?
+
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  appointments      Appointment[]
+}
+
+model Patient {
+  id               String   @id @default(cuid())
+  patientId        String   @unique
+
+  name             String
+  age              Int
+  gender           String
+
+  phone            String
+  address          String
+
+  bloodGroup       String?
+  disease          String?
+
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  appointments     Appointment[]
+  bills            Bill[]
+}
+
+model Appointment {
+  id            String   @id @default(cuid())
+
+  tokenNumber   Int
+
+  date          DateTime
+
+  status        String
+
+  notes         String?
+
+  doctorId      String
+  patientId     String
+
+  doctor        Doctor   @relation(fields: [doctorId], references: [id])
+  patient       Patient  @relation(fields: [patientId], references: [id])
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model Staff {
+  id            String   @id @default(cuid())
+
+  name          String
+  role          String
+
+  phone         String
+  email         String?
+
+  salary        Float
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model Bill {
+  id                 String   @id @default(cuid())
+
+  consultationFee    Float
+  medicineCharge     Float
+  otherCharge        Float
+
+  totalAmount        Float
+
+  patientId          String
+
+  patient            Patient @relation(fields: [patientId], references: [id])
+
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+}
