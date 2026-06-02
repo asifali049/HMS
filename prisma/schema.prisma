@@ -12,20 +12,24 @@ model Admin {
   name      String
   email     String   @unique
   password  String
+  image     String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model Hospital {
-  id          String   @id @default(cuid())
-  name        String
-  email       String
-  phone       String
-  address     String
-  description String?
-
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id           String   @id @default(cuid())
+  name         String
+  email        String?
+  phone        String?
+  address      String?
+  city         String?
+  state        String?
+  pincode      String?
+  website      String?
+  logo         String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 }
 
 model Doctor {
@@ -91,18 +95,17 @@ model Appointment {
 }
 
 model Staff {
-  id            String   @id @default(cuid())
-
-  name          String
-  role          String
-
-  phone         String
-  email         String?
-
-  salary        Float
-
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  id          String   @id @default(cuid())
+  employeeId  String   @unique
+  name        String
+  email       String   @unique
+  phone       String
+  role        String
+  salary      Float
+  joiningDate DateTime
+  status      String   @default("Active")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 model Bill {
@@ -120,4 +123,12 @@ model Bill {
 
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
+} 
+
+model Department {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }

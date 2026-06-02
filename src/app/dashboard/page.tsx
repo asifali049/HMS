@@ -1,91 +1,101 @@
-import { prisma } from "@/lib/prisma";
-import {
-  Users,
-  Stethoscope,
-  Calendar,
-  IndianRupee,
-} from "lucide-react";
+"use client";
 
-import QuickActions from "@/components/dashboard/QuickActions";
-import RecentActivity from "@/components/dashboard/RecentActivity";
+import { useEffect, useState } from "react";
 
-export default async function DashboardPage() {
-  const totalDoctors =
-    await prisma.doctor.count();
-
-  const totalPatients =
-    await prisma.patient.count();
-
-  const totalAppointments =
-    await prisma.appointment.count();
-
-  const revenue =
-    await prisma.bill.aggregate({
-      _sum: {
-        totalAmount: true,
-      },
+export default function DashboardPage() {
+  const [stats, setStats] =
+    useState({
+      doctors: 0,
+      patients: 0,
+      appointments: 0,
+      departments: 0,
     });
 
-  const totalRevenue =
-    revenue._sum.totalAmount || 0;
+  useEffect(() => {
+    async function loadStats() {
+      const doctors =
+        await fetch(
+          "/api/doctors"
+        ).then((r) => r.json());
+
+      const patients =
+        await fetch(
+          "/api/patients"
+        ).then((r) => r.json());
+
+      const appointments =
+        await fetch(
+          "/api/appointments"
+        ).then((r) => r.json());
+
+      const departments =
+        await fetch(
+          "/api/departments"
+        ).then((r) => r.json());
+
+      setStats({
+        doctors:
+          doctors.data?.length || 0,
+        patients:
+          patients.data?.length || 0,
+        appointments:
+          appointments.data?.length ||
+          0,
+        departments:
+          departments.data?.length ||
+          0,
+      });
+    }
+
+    loadStats();
+  }, []);
 
   return (
-    <div className="space-y-8">
-      <div>
-        <h1 className="text-4xl font-bold">
-          Dashboard
-        </h1>
+    <div>
+      <h1 className="mb-8 text-3xl font-bold">
+        Dashboard
+      </h1>
 
-        <p className="mt-2 text-slate-500">
-          Hospital Overview
-        </p>
-      </div>
-
-      <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
-        <div className="rounded-2xl border bg-white p-6 shadow-sm">
-          <Users className="mb-3 text-blue-600" />
-          <p className="text-slate-500">
-            Patients
-          </p>
-          <h2 className="mt-2 text-4xl font-bold">
-            {totalPatients}
-          </h2>
-        </div>
-
-        <div className="rounded-2xl border bg-white p-6 shadow-sm">
-          <Stethoscope className="mb-3 text-green-600" />
-          <p className="text-slate-500">
+      <div className="grid grid-cols-4 gap-6">
+        <div className="rounded-xl bg-white p-6 shadow">
+          <h2 className="text-slate-500">
             Doctors
-          </p>
-          <h2 className="mt-2 text-4xl font-bold">
-            {totalDoctors}
           </h2>
+
+          <p className="mt-2 text-3xl font-bold">
+            {stats.doctors}
+          </p>
         </div>
 
-        <div className="rounded-2xl border bg-white p-6 shadow-sm">
-          <Calendar className="mb-3 text-orange-500" />
-          <p className="text-slate-500">
+        <div className="rounded-xl bg-white p-6 shadow">
+          <h2 className="text-slate-500">
+            Patients
+          </h2>
+
+          <p className="mt-2 text-3xl font-bold">
+            {stats.patients}
+          </p>
+        </div>
+
+        <div className="rounded-xl bg-white p-6 shadow">
+          <h2 className="text-slate-500">
             Appointments
-          </p>
-          <h2 className="mt-2 text-4xl font-bold">
-            {totalAppointments}
           </h2>
+
+          <p className="mt-2 text-3xl font-bold">
+            {stats.appointments}
+          </p>
         </div>
 
-        <div className="rounded-2xl border bg-white p-6 shadow-sm">
-          <IndianRupee className="mb-3 text-purple-600" />
-          <p className="text-slate-500">
-            Revenue
-          </p>
-          <h2 className="mt-2 text-4xl font-bold">
-            ₹{totalRevenue}
+        <div className="rounded-xl bg-white p-6 shadow">
+          <h2 className="text-slate-500">
+            Departments
           </h2>
-        </div>
-      </div>
 
-      <div className="grid gap-6 lg:grid-cols-2">
-        <QuickActions />
-        <RecentActivity />
+          <p className="mt-2 text-3xl font-bold">
+            {stats.departments}
+          </p>
+        </div>
       </div>
     </div>
   );

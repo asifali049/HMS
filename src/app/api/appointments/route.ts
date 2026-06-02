@@ -28,15 +28,20 @@ export async function POST(
       data: appointment,
     });
   } catch (error) {
+    console.error(
+      "APPOINTMENT ERROR:",
+      error
+    );
+
     return NextResponse.json(
       {
         success: false,
-        error,
+        error: String(error),
       },
       { status: 400 }
     );
   }
-}
+} 
 
 export async function GET() {
   const appointments =

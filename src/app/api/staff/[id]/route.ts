@@ -11,30 +11,18 @@ export async function GET(
     }>;
   }
 ) {
-  try {
-    const { id } =
-      await params;
+  const { id } =
+    await params;
 
-    const staff =
-      await prisma.staff.findUnique({
-        where: {
-          id,
-        },
-      });
-
-    return NextResponse.json({
-      success: true,
-      data: staff,
+  const staff =
+    await prisma.staff.findUnique({
+      where: { id },
     });
-  } catch (error) {
-    return NextResponse.json(
-      {
-        success: false,
-        error: String(error),
-      },
-      { status: 500 }
-    );
-  }
+
+  return NextResponse.json({
+    success: true,
+    data: staff,
+  });
 }
 
 export async function PATCH(
@@ -54,11 +42,9 @@ export async function PATCH(
     const body =
       await req.json();
 
-    const updated =
+    const staff =
       await prisma.staff.update({
-        where: {
-          id,
-        },
+        where: { id },
         data: {
           employeeId:
             body.employeeId,
@@ -80,7 +66,7 @@ export async function PATCH(
 
     return NextResponse.json({
       success: true,
-      data: updated,
+      data: staff,
     });
   } catch (error) {
     return NextResponse.json(
@@ -108,15 +94,11 @@ export async function DELETE(
       await params;
 
     await prisma.staff.delete({
-      where: {
-        id,
-      },
+      where: { id },
     });
 
     return NextResponse.json({
       success: true,
-      message:
-        "Staff Deleted",
     });
   } catch (error) {
     return NextResponse.json(

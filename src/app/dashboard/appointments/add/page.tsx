@@ -31,41 +31,59 @@ export default function AddAppointmentPage() {
   useEffect(() => {
     fetch("/api/doctors")
       .then((res) => res.json())
-      .then((data) => setDoctors(data.data));
+      .then((data) => setDoctors(data.data || []));
 
     fetch("/api/patients")
       .then((res) => res.json())
-      .then((data) => setPatients(data.data));
+      .then((data) => setPatients(data.data || []));
   }, []);
 
-  const handleSubmit = async (
+  async function handleSubmit(
     e: React.FormEvent
-  ) => {
+  ) {
     e.preventDefault();
 
-    const res = await fetch(
-      "/api/appointments",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type":
-            "application/json",
-        },
-        body: JSON.stringify(form),
-      }
-    );
-
-    const data = await res.json();
-
-    if (data.success) {
-      router.push(
-        "/dashboard/appointments"
+    try {
+      const response = await fetch(
+        "/api/appointments",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type":
+              "application/json",
+          },
+          body: JSON.stringify(form),
+        }
       );
+
+      const data =
+        await response.json();
+
+      console.log(data);
+
+      if (data.success) {
+        alert(
+          "Appointment Created"
+        );
+
+        router.push(
+          "/dashboard/appointments"
+        );
+      } else {
+        alert(
+          data.error ||
+            "Create Failed"
+        );
+      }
+    } catch (error) {
+      console.error(error);
+
+      alert("Server Error");
     }
-  };
+  }
 
   return (
-    <div className="max-w-3xl">
+    <div className="max-w-4xl">
       <h1 className="mb-6 text-3xl font-bold">
         Create Appointment
       </h1>
@@ -75,7 +93,7 @@ export default function AddAppointmentPage() {
         className="space-y-4"
       >
         <select
-          className="w-full border p-3 rounded"
+          className="w-full rounded-lg border p-3"
           value={form.patientId}
           onChange={(e) =>
             setForm({
@@ -100,7 +118,7 @@ export default function AddAppointmentPage() {
         </select>
 
         <select
-          className="w-full border p-3 rounded"
+          className="w-full rounded-lg border p-3"
           value={form.doctorId}
           onChange={(e) =>
             setForm({
@@ -125,7 +143,7 @@ export default function AddAppointmentPage() {
 
         <input
           type="date"
-          className="w-full border p-3 rounded"
+          className="w-full rounded-lg border p-3"
           value={form.date}
           onChange={(e) =>
             setForm({
@@ -137,7 +155,7 @@ export default function AddAppointmentPage() {
 
         <input
           type="time"
-          className="w-full border p-3 rounded"
+          className="w-full rounded-lg border p-3"
           value={form.time}
           onChange={(e) =>
             setForm({
@@ -147,9 +165,10 @@ export default function AddAppointmentPage() {
           }
         />
 
-        <input
+        <textarea
+          rows={4}
           placeholder="Reason"
-          className="w-full border p-3 rounded"
+          className="w-full rounded-lg border p-3"
           value={form.reason}
           onChange={(e) =>
             setForm({
@@ -161,7 +180,7 @@ export default function AddAppointmentPage() {
 
         <button
           type="submit"
-          className="bg-blue-600 text-white px-4 py-2 rounded"
+          className="rounded-lg bg-blue-600 px-5 py-3 font-medium text-white"
         >
           Create Appointment
         </button>
