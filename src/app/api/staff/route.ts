@@ -1,27 +1,17 @@
-import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { NextRequest, NextResponse } from "next/server";
 
 export async function GET() {
-  try {
-    const staff = await prisma.staff.findMany({
-      orderBy: {
-        createdAt: "desc",
-      },
-    });
+  const staff = await prisma.staff.findMany({
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
 
-    return NextResponse.json({
-      success: true,
-      data: staff,
-    });
-  } catch (error) {
-    return NextResponse.json(
-      {
-        success: false,
-        error: String(error),
-      },
-      { status: 500 }
-    );
-  }
+  return NextResponse.json({
+    success: true,
+    data: staff,
+  });
 }
 
 export async function POST(
@@ -39,15 +29,13 @@ export async function POST(
           email: body.email,
           phone: body.phone,
           role: body.role,
-          salary: Number(
+          salary: parseFloat(
             body.salary
           ),
           joiningDate: new Date(
             body.joiningDate
           ),
-          status:
-            body.status ||
-            "Active",
+          status: body.status,
         },
       });
 
@@ -56,8 +44,6 @@ export async function POST(
       data: staff,
     });
   } catch (error) {
-    console.error(error);
-
     return NextResponse.json(
       {
         success: false,

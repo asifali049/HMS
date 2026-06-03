@@ -15,13 +15,8 @@ type Patient = {
 };
 
 export default function EditAppointmentPage() {
-  const params = useParams();
+  const { id } = useParams();
   const router = useRouter();
-
-  const id =
-    typeof params.id === "string"
-      ? params.id
-      : "";
 
   const [loading, setLoading] =
     useState(true);
@@ -36,71 +31,75 @@ export default function EditAppointmentPage() {
     patientId: "",
     doctorId: "",
     date: "",
-    status: "Pending",
+    time: "",
     reason: "",
+    status: "PENDING",
+    notes: "",
   });
 
   useEffect(() => {
-    if (!id) return;
-
     async function loadData() {
       try {
         const doctorsRes =
           await fetch("/api/doctors");
-        const doctorsData =
-          await doctorsRes.json();
-
-        setDoctors(
-          doctorsData.data || []
-        );
 
         const patientsRes =
           await fetch("/api/patients");
-        const patientsData =
-          await patientsRes.json();
-
-        setPatients(
-          patientsData.data || []
-        );
 
         const appointmentRes =
           await fetch(
             `/api/appointments/${id}`
           );
 
+        const doctorsData =
+          await doctorsRes.json();
+
+        const patientsData =
+          await patientsRes.json();
+
         const appointmentData =
           await appointmentRes.json();
+
+        setDoctors(
+          doctorsData.data || []
+        );
+
+        setPatients(
+          patientsData.data || []
+        );
 
         const appointment =
           appointmentData.data;
 
-        if (appointment) {
-          setForm({
-            patientId:
-              appointment.patientId || "",
-            doctorId:
-              appointment.doctorId || "",
-            date: appointment.date
-              ? appointment.date.split(
-                  "T"
-                )[0]
-              : "",
-            status:
-              appointment.status ||
-              "Pending",
-            reason:
-              appointment.reason || "",
-          });
-        }
+        setForm({
+          patientId:
+            appointment.patientId,
+          doctorId:
+            appointment.doctorId,
+          date:
+            appointment.date
+              ?.split("T")[0] || "",
+          time:
+            appointment.time || "",
+          reason:
+            appointment.reason ||
+            "",
+          status:
+            appointment.status ||
+            "PENDING",
+          notes:
+            appointment.notes || "",
+        });
 
         setLoading(false);
       } catch (error) {
-        console.error(error);
-        setLoading(false);
+        console.log(error);
       }
     }
 
-    loadData();
+    if (id) {
+      loadData();
+    }
   }, [id]);
 
   async function handleSubmit(
@@ -108,23 +107,21 @@ export default function EditAppointmentPage() {
   ) {
     e.preventDefault();
 
-    if (!id) {
-      alert("ID Missing");
-      return;
-    }
-
     try {
-      const response = await fetch(
-        `/api/appointments/${id}`,
-        {
-          method: "PATCH",
-          headers: {
-            "Content-Type":
-              "application/json",
-          },
-          body: JSON.stringify(form),
-        }
-      );
+      const response =
+        await fetch(
+          `/api/appointments/${id}`,
+          {
+            method: "PATCH",
+            headers: {
+              "Content-Type":
+                "application/json",
+            },
+            body: JSON.stringify(
+              form
+            ),
+          }
+        );
 
       const data =
         await response.json();
@@ -144,141 +141,222 @@ export default function EditAppointmentPage() {
         );
       }
     } catch (error) {
-      console.error(error);
-      alert("Something went wrong");
+      console.log(error);
+      alert("Server Error");
     }
   }
 
   if (loading) {
     return (
-      <div className="p-6">
+      <div className="text-white">
         Loading...
       </div>
     );
   }
 
   return (
-    <div className="mx-auto max-w-4xl">
-      <h1 className="mb-6 text-3xl font-bold">
+    <div className="max-w-5xl">
+      <h1 className="mb-8 text-4xl font-bold text-white">
         Edit Appointment
       </h1>
 
-      <form
-        onSubmit={handleSubmit}
-        className="space-y-4 rounded-xl border bg-white p-6 shadow"
-      >
-        <select
-          className="w-full rounded-lg border p-3"
-          value={form.patientId}
-          onChange={(e) =>
-            setForm({
-              ...form,
-              patientId:
-                e.target.value,
-            })
-          }
+      <div className="rounded-3xl border border-slate-800 bg-slate-900 p-8">
+        <form
+          onSubmit={handleSubmit}
+          className="space-y-6"
         >
-          <option value="">
-            Select Patient
-          </option>
+          <div className="grid gap-6 md:grid-cols-2">
+            <div>
+              <label className="mb-2 block text-sm text-slate-400">
+                Patient
+              </label>
 
-          {patients.map((patient) => (
-            <option
-              key={patient.id}
-              value={patient.id}
-            >
-              {patient.patientId} -{" "}
-              {patient.name}
-            </option>
-          ))}
-        </select>
+              <select
+                value={
+                  form.patientId
+                }
+                onChange={(e) =>
+                  setForm({
+                    ...form,
+                    patientId:
+                      e.target.value,
+                  })
+                }
+                className="w-full rounded-xl border border-slate-700 bg-slate-800 p-3 text-white"
+              >
+                {patients.map(
+                  (patient) => (
+                    <option
+                      key={
+                        patient.id
+                      }
+                      value={
+                        patient.id
+                      }
+                    >
+                      {
+                        patient.name
+                      }
+                    </option>
+                  )
+                )}
+              </select>
+            </div>
 
-        <select
-          className="w-full rounded-lg border p-3"
-          value={form.doctorId}
-          onChange={(e) =>
-            setForm({
-              ...form,
-              doctorId:
-                e.target.value,
-            })
-          }
-        >
-          <option value="">
-            Select Doctor
-          </option>
+            <div>
+              <label className="mb-2 block text-sm text-slate-400">
+                Doctor
+              </label>
 
-          {doctors.map((doctor) => (
-            <option
-              key={doctor.id}
-              value={doctor.id}
-            >
-              {doctor.name}
-            </option>
-          ))}
-        </select>
+              <select
+                value={
+                  form.doctorId
+                }
+                onChange={(e) =>
+                  setForm({
+                    ...form,
+                    doctorId:
+                      e.target.value,
+                  })
+                }
+                className="w-full rounded-xl border border-slate-700 bg-slate-800 p-3 text-white"
+              >
+                {doctors.map(
+                  (doctor) => (
+                    <option
+                      key={
+                        doctor.id
+                      }
+                      value={
+                        doctor.id
+                      }
+                    >
+                      {
+                        doctor.name
+                      }
+                    </option>
+                  )
+                )}
+              </select>
+            </div>
 
-        <input
-          type="date"
-          className="w-full rounded-lg border p-3"
-          value={form.date}
-          onChange={(e) =>
-            setForm({
-              ...form,
-              date: e.target.value,
-            })
-          }
-        />
+            <div>
+              <label className="mb-2 block text-sm text-slate-400">
+                Date
+              </label>
 
-        <select
-          className="w-full rounded-lg border p-3"
-          value={form.status}
-          onChange={(e) =>
-            setForm({
-              ...form,
-              status:
-                e.target.value,
-            })
-          }
-        >
-          <option value="Pending">
-            Pending
-          </option>
+              <input
+                type="date"
+                value={form.date}
+                onChange={(e) =>
+                  setForm({
+                    ...form,
+                    date:
+                      e.target.value,
+                  })
+                }
+                className="w-full rounded-xl border border-slate-700 bg-slate-800 p-3 text-white"
+              />
+            </div>
 
-          <option value="Confirmed">
-            Confirmed
-          </option>
+            <div>
+              <label className="mb-2 block text-sm text-slate-400">
+                Time
+              </label>
 
-          <option value="Completed">
-            Completed
-          </option>
+              <input
+                type="time"
+                value={form.time}
+                onChange={(e) =>
+                  setForm({
+                    ...form,
+                    time:
+                      e.target.value,
+                  })
+                }
+                className="w-full rounded-xl border border-slate-700 bg-slate-800 p-3 text-white"
+              />
+            </div>
 
-          <option value="Cancelled">
-            Cancelled
-          </option>
-        </select>
+            <div>
+              <label className="mb-2 block text-sm text-slate-400">
+                Status
+              </label>
 
-        <textarea
-          rows={4}
-          placeholder="Reason"
-          className="w-full rounded-lg border p-3"
-          value={form.reason}
-          onChange={(e) =>
-            setForm({
-              ...form,
-              reason:
-                e.target.value,
-            })
-          }
-        />
+              <select
+                value={
+                  form.status
+                }
+                onChange={(e) =>
+                  setForm({
+                    ...form,
+                    status:
+                      e.target.value,
+                  })
+                }
+                className="w-full rounded-xl border border-slate-700 bg-slate-800 p-3 text-white"
+              >
+                <option value="PENDING">
+                  Pending
+                </option>
 
-        <button
-          type="submit"
-          className="rounded-lg bg-emerald-600 px-5 py-3 font-medium text-white"
-        >
-          Update Appointment
-        </button>
-      </form>
+                <option value="COMPLETED">
+                  Completed
+                </option>
+
+                <option value="CANCELLED">
+                  Cancelled
+                </option>
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label className="mb-2 block text-sm text-slate-400">
+              Reason
+            </label>
+
+            <textarea
+              rows={4}
+              value={form.reason}
+              onChange={(e) =>
+                setForm({
+                  ...form,
+                  reason:
+                    e.target.value,
+                })
+              }
+              className="w-full rounded-xl border border-slate-700 bg-slate-800 p-3 text-white"
+            />
+          </div>
+
+          <div>
+            <label className="mb-2 block text-sm text-slate-400">
+              Notes
+            </label>
+
+            <textarea
+              rows={4}
+              value={form.notes}
+              onChange={(e) =>
+                setForm({
+                  ...form,
+                  notes:
+                    e.target.value,
+                })
+              }
+              className="w-full rounded-xl border border-slate-700 bg-slate-800 p-3 text-white"
+            />
+          </div>
+
+          <button
+            type="submit"
+            className="rounded-xl bg-emerald-500 px-6 py-3 font-semibold text-white hover:bg-emerald-600"
+          >
+            Update Appointment
+          </button>
+        </form>
+      </div>
     </div>
   );
 }

@@ -9,8 +9,7 @@ export default function EditStaffPage() {
 
   const id = params.id as string;
 
-  const [loading, setLoading] =
-    useState(true);
+  const [loading, setLoading] = useState(true);
 
   const [form, setForm] = useState({
     employeeId: "",
@@ -33,11 +32,10 @@ export default function EditStaffPage() {
         const data =
           await response.json();
 
-        if (data.success) {
+        if (data.success && data.data) {
           setForm({
             employeeId:
-              data.data.employeeId ||
-              "",
+              data.data.employeeId || "",
 
             name:
               data.data.name || "",
@@ -56,9 +54,9 @@ export default function EditStaffPage() {
             ),
 
             joiningDate:
-              data.data.joiningDate
-                ?.split("T")[0] ||
-              "",
+              data.data.joiningDate?.split(
+                "T"
+              )[0] || "",
 
             status:
               data.data.status ||
@@ -107,7 +105,10 @@ export default function EditStaffPage() {
           "/dashboard/staff"
         );
       } else {
-        alert("Update Failed");
+        alert(
+          data.error ||
+            "Update Failed"
+        );
       }
     } catch (error) {
       console.error(error);
@@ -117,27 +118,26 @@ export default function EditStaffPage() {
 
   if (loading) {
     return (
-      <div className="p-6">
+      <div className="p-6 text-white">
         Loading...
       </div>
     );
   }
 
   return (
-    <div className="max-w-5xl">
-      <h1 className="mb-6 text-3xl font-bold">
+    <div className="max-w-6xl">
+      <h1 className="mb-6 text-4xl font-bold text-white">
         Edit Staff
       </h1>
 
       <form
         onSubmit={handleSubmit}
-        className="rounded-2xl border bg-white p-6 shadow-sm"
+        className="rounded-2xl bg-slate-800 p-8 shadow-lg"
       >
-        <div className="grid grid-cols-2 gap-4">
-
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <input
             placeholder="Employee ID"
-            className="rounded-lg border p-3"
+            className="w-full rounded-lg border border-slate-600 bg-slate-900 px-4 py-3 text-white"
             value={form.employeeId}
             onChange={(e) =>
               setForm({
@@ -150,7 +150,7 @@ export default function EditStaffPage() {
 
           <input
             placeholder="Full Name"
-            className="rounded-lg border p-3"
+            className="w-full rounded-lg border border-slate-600 bg-slate-900 px-4 py-3 text-white"
             value={form.name}
             onChange={(e) =>
               setForm({
@@ -163,7 +163,7 @@ export default function EditStaffPage() {
           <input
             type="email"
             placeholder="Email"
-            className="rounded-lg border p-3"
+            className="w-full rounded-lg border border-slate-600 bg-slate-900 px-4 py-3 text-white"
             value={form.email}
             onChange={(e) =>
               setForm({
@@ -175,7 +175,7 @@ export default function EditStaffPage() {
 
           <input
             placeholder="Phone"
-            className="rounded-lg border p-3"
+            className="w-full rounded-lg border border-slate-600 bg-slate-900 px-4 py-3 text-white"
             value={form.phone}
             onChange={(e) =>
               setForm({
@@ -187,7 +187,7 @@ export default function EditStaffPage() {
 
           <input
             placeholder="Role"
-            className="rounded-lg border p-3"
+            className="w-full rounded-lg border border-slate-600 bg-slate-900 px-4 py-3 text-white"
             value={form.role}
             onChange={(e) =>
               setForm({
@@ -200,7 +200,7 @@ export default function EditStaffPage() {
           <input
             type="number"
             placeholder="Salary"
-            className="rounded-lg border p-3"
+            className="w-full rounded-lg border border-slate-600 bg-slate-900 px-4 py-3 text-white"
             value={form.salary}
             onChange={(e) =>
               setForm({
@@ -213,7 +213,7 @@ export default function EditStaffPage() {
 
           <input
             type="date"
-            className="rounded-lg border p-3"
+            className="w-full rounded-lg border border-slate-600 bg-slate-900 px-4 py-3 text-white"
             value={
               form.joiningDate
             }
@@ -227,7 +227,7 @@ export default function EditStaffPage() {
           />
 
           <select
-            className="rounded-lg border p-3"
+            className="w-full rounded-lg border border-slate-600 bg-slate-900 px-4 py-3 text-white"
             value={form.status}
             onChange={(e) =>
               setForm({
@@ -245,15 +245,28 @@ export default function EditStaffPage() {
               Inactive
             </option>
           </select>
-
         </div>
 
-        <button
-          type="submit"
-          className="mt-6 rounded-lg bg-emerald-600 px-5 py-3 text-white"
-        >
-          Update Staff
-        </button>
+        <div className="mt-6 flex gap-3">
+          <button
+            type="submit"
+            className="rounded-lg bg-emerald-600 px-6 py-3 font-semibold text-white hover:bg-emerald-700"
+          >
+            Update Staff
+          </button>
+
+          <button
+            type="button"
+            onClick={() =>
+              router.push(
+                "/dashboard/staff"
+              )
+            }
+            className="rounded-lg bg-slate-600 px-6 py-3 font-semibold text-white"
+          >
+            Cancel
+          </button>
+        </div>
       </form>
     </div>
   );

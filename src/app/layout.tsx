@@ -8,7 +8,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>
+      <body className="rounded-2xl border border-slate-800 bg-slate-900 p-6">
         <QueryProvider>
           {children}
         </QueryProvider>
